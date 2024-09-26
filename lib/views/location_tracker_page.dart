@@ -11,14 +11,13 @@ class LocationTrackingPage extends StatefulWidget {
   const LocationTrackingPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LocationTrackingPageState createState() => _LocationTrackingPageState();
+  State<LocationTrackingPage> createState() => _LocationTrackingPageState();
 }
 
 class _LocationTrackingPageState extends State<LocationTrackingPage> {
   LatLng currentLocation = const LatLng(23.8041, 90.4152);
   double zoom = 4;
-  Key mapKey = UniqueKey(); // Add this line
+  Key mapKey = UniqueKey();
   var isLoaded = false;
 
   @override
@@ -53,8 +52,7 @@ class _LocationTrackingPageState extends State<LocationTrackingPage> {
                         ),
                         MarkerLayer(markers: [
                           Marker(
-                            point:
-                                currentLocation, // Update with actual current location
+                            point: currentLocation,
                             width: 80.0,
                             height: 80.0,
                             child: const Icon(Icons.location_on,
