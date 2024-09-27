@@ -33,60 +33,117 @@ class _HomepageState extends State<Homepage> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: RefreshIndicator(
-          onRefresh: () async {},
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ...locationPart(),
-                    ...headerPart(),
-                    ...daySelector(),
-                    Container(
-                      height: 130,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white.withOpacity(.4),
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(35),
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xff97ABFF),
-                            Color.fromARGB(255, 109, 138, 253),
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () async {},
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ...locationPart(),
+                      ...headerPart(),
+                      ...daySelector(),
+                      timeScifiedResult(),
+                      //   Padding(
+                      //     padding: EdgeInsets.only(top: 15),
+                      //     child: Stack(
+                      //       children: [
+                      //         Padding(
+                      //           padding: const EdgeInsets.only(top: 10),
+                      //           child: Container(
+                      //             width: double.infinity,
+                      //             height: 270,
+                      //             decoration: BoxDecoration(
+                      //                 gradient: LinearGradient(
+                      //                     colors: [
+                      //                       Color(0xff9AABE3),
+                      //                       Color(0xff2949A4),
+                      //                     ],
+                      //                     begin: Alignment.topLeft,
+                      //                     end: Alignment.bottomRight),
+                      //                 border:
+                      //                     Border.all(color: Color(0xff9AABE3)),
+                      //                 borderRadius: BorderRadius.vertical(
+                      //                     top: Radius.elliptical(220, 130))),
+                      //           ),
+                      //         ),
+                      //         Positioned(
+                      //           top: 0,
+                      //           left: 0,
+                      //           right: 0,
+                      //           child: Container(
+                      //             height: 57,
+                      //             width: 57,
+                      //             decoration: BoxDecoration(
+                      //               color: Colors.blue,
+                      //               shape: BoxShape.circle,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 18.0),
+                              child: ClipPath(
+                                clipper: CircularNotchedClipper(),
+                                child: Container(
+                                  height: 270.0,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color(0xff9AABE3),
+                                        Color(0xff2949A4),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    border: Border.all(
+                                      color: Color(0xff9AABE3),
+                                    ),
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.elliptical(220, 130),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 47,
+                                width: 47,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(255, 218, 232, 255),
+                                      Color.fromARGB(255, 2, 62, 213),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          // stops: [0.40, 1],
                         ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            'Now',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Image.asset(
-                            AppImages.slightTouchHappyDay,
-                            width: 55,
-                          ),
-                          Text(
-                            '13°',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -188,5 +245,114 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
     ];
+  }
+
+  Widget timeScifiedResult() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          timeSpecifiedContainer(
+              time: 'Now',
+              image: AppImages.slightTouchHappyDay,
+              temperature: 30),
+          timeSpecifiedContainer(
+              time: 'Now',
+              image: AppImages.slightTouchHappyDay,
+              temperature: 30),
+          timeSpecifiedContainer(
+              time: 'Now',
+              image: AppImages.slightTouchHappyDay,
+              temperature: 30),
+          timeSpecifiedContainer(
+              time: 'Now',
+              image: AppImages.slightTouchHappyDay,
+              temperature: 30),
+          timeSpecifiedContainer(
+              time: 'Now',
+              image: AppImages.slightTouchHappyDay,
+              temperature: 30),
+          timeSpecifiedContainer(
+              time: 'Now',
+              image: AppImages.slightTouchHappyDay,
+              temperature: 30),
+        ],
+      ),
+    );
+  }
+
+  Widget timeSpecifiedContainer(
+      {required String time,
+      required String image,
+      required double temperature}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+      child: Container(
+        height: 130,
+        width: 60,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.white.withOpacity(.4),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(35),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xff97ABFF),
+              Color.fromARGB(255, 109, 138, 253),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            // stops: [0.40, 1],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              time,
+              style: TextStyle(color: Colors.white),
+            ),
+            Image.asset(
+              image,
+              width: 55,
+            ),
+            Text(
+              '$temperature°',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CircularNotchedClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double notchRadius = 15.0;
+    double centerWidth = size.width / 2;
+
+    final path = Path();
+    path.lineTo(centerWidth - notchRadius - 20, 0);
+
+    path.arcToPoint(
+      Offset(centerWidth + notchRadius + 20, 0),
+      radius: Radius.circular(notchRadius),
+      clockwise: false,
+    );
+
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
   }
 }
