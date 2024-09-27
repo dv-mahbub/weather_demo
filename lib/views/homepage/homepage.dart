@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_demo/components/constants/images.dart';
-import 'package:weather_demo/views/homepage/circularNotchClipper.dart';
+import 'package:weather_demo/views/homepage/circular_notch_clipper.dart';
 import 'package:weather_demo/views/homepage/triangle.dart';
 
 class Homepage extends StatefulWidget {
@@ -57,49 +57,6 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget bottomPart() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 5),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 18.0),
-            child: ClipPath(
-              clipper: CircularNotchedClipper(),
-              child: Container(
-                height: 270.0,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xff9AABE3),
-                      Color(0xff2949A4),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  border: Border.all(
-                    color: const Color(0xff9AABE3),
-                  ),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.elliptical(220, 130),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Align(
-              child: circularContainer(),
-            ),
-          )
-        ],
       ),
     );
   }
@@ -168,7 +125,6 @@ class _HomepageState extends State<Homepage> {
                   });
                 }
               },
-              child: const Text('Today'),
               style: ButtonStyle(
                 padding: const WidgetStatePropertyAll(
                     EdgeInsets.symmetric(horizontal: 35)),
@@ -177,6 +133,7 @@ class _HomepageState extends State<Homepage> {
                     : const WidgetStatePropertyAll(Color(0xff4D66B8)),
                 foregroundColor: const WidgetStatePropertyAll(Colors.white),
               ),
+              child: const Text('Today'),
             ),
             const Gap(5),
             ElevatedButton(
@@ -187,13 +144,13 @@ class _HomepageState extends State<Homepage> {
                   });
                 }
               },
-              child: const Text('Next Day'),
               style: ButtonStyle(
                 backgroundColor: !isTodaySelected
                     ? const WidgetStatePropertyAll(Color(0xff7087D8))
                     : const WidgetStatePropertyAll(Color(0xff4D66B8)),
                 foregroundColor: const WidgetStatePropertyAll(Colors.white),
               ),
+              child: const Text('Next Day'),
             ),
           ],
         ),
@@ -281,6 +238,56 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  Widget bottomPart() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 5),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 18.0),
+            child: ClipPath(
+              clipper: CircularNotchedClipper(),
+              child: Container(
+                height: 270.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xff9AABE3),
+                      Color(0xff2949A4),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(
+                    color: const Color(0xff9AABE3),
+                  ),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.elliptical(220, 130),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const Gap(60),
+                    sunsetSunriseContainer(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Align(
+              child: circularContainer(),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget circularContainer() {
     return Container(
       padding: const EdgeInsets.all(2),
@@ -302,6 +309,77 @@ class _HomepageState extends State<Homepage> {
         size: const Size(10, 10),
         painter: Triangle(),
       ),
+    );
+  }
+
+  Widget sunsetSunriseContainer() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+      width: screenWidth * .85,
+      height: 88,
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromARGB(255, 177, 195, 252),
+            Color.fromARGB(255, 80, 123, 243),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Image.asset(
+            AppImages.sunset,
+            width: 56,
+          ),
+          textColumn(
+            title: 'Sunset',
+            info: '5:51PM',
+          ),
+          textColumn(
+            title: 'Sunrise',
+            info: '7:00AM',
+            align: CrossAxisAlignment.end,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget textColumn(
+      {required String title,
+      required String info,
+      CrossAxisAlignment? align}) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: align ?? CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.quicksand(
+            textStyle: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Text(
+          info,
+          style: GoogleFonts.quicksand(
+            textStyle: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

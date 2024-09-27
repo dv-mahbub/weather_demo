@@ -6,4 +6,6 @@ class AppImages {
   static String partlyDayStrom = '$imageFolder/partly_day_storm.png';
   static String rainy = '$imageFolder/rainy.png';
   static String slightTouchHappyDay = '$imageFolder/slight_touch_happy_day.png';
+  static String sun = '$imageFolder/sun.png';
+  static String sunset = '$imageFolder/sunset.png';
 }
