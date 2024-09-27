@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 import 'package:weather_demo/components/global_functions/navigate.dart';
 import 'package:weather_demo/components/global_widgets/show_message.dart';
-import 'package:weather_demo/views/homepage.dart';
+import 'package:weather_demo/views/homepage/homepage.dart';
 
 class LocationTrackingPage extends StatefulWidget {
   const LocationTrackingPage({super.key});

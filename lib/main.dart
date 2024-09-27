@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_demo/views/homepage.dart';
+import 'package:weather_demo/views/homepage/homepage.dart';
 import 'package:weather_demo/views/splash_screen.dart/splash_screen.dart';
 
 void main() {
