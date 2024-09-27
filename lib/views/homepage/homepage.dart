@@ -253,7 +253,7 @@ class _HomepageState extends State<Homepage> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xff9AABE3),
+                      Color.fromARGB(255, 198, 209, 248),
                       Color(0xff2949A4),
                     ],
                     begin: Alignment.topLeft,
@@ -263,13 +263,15 @@ class _HomepageState extends State<Homepage> {
                     color: const Color(0xff9AABE3),
                   ),
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.elliptical(220, 130),
+                    top: Radius.elliptical(220, 115),
                   ),
                 ),
                 child: Column(
                   children: [
-                    const Gap(60),
+                    const Gap(55),
                     sunsetSunriseContainer(),
+                    const Gap(12),
+                    uvContainer(),
                   ],
                 ),
               ),
@@ -354,7 +356,8 @@ class _HomepageState extends State<Homepage> {
   Widget textColumn(
       {required String title,
       required String info,
-      CrossAxisAlignment? align}) {
+      CrossAxisAlignment? align,
+      Color? color}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: align ?? CrossAxisAlignment.start,
@@ -362,8 +365,8 @@ class _HomepageState extends State<Homepage> {
         Text(
           title,
           style: GoogleFonts.quicksand(
-            textStyle: const TextStyle(
-              color: Colors.white,
+            textStyle: TextStyle(
+              color: color ?? Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -372,14 +375,50 @@ class _HomepageState extends State<Homepage> {
         Text(
           info,
           style: GoogleFonts.quicksand(
-            textStyle: const TextStyle(
-              color: Colors.white,
+            textStyle: TextStyle(
+              color: color ?? Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget uvContainer() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+      width: screenWidth * .85,
+      height: 88,
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromARGB(255, 177, 195, 252),
+            Color.fromARGB(255, 72, 115, 234),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Image.asset(
+            AppImages.sun,
+            width: 56,
+          ),
+          textColumn(
+            title: 'UV Index',
+            info: '1 Low',
+            color: Colors.white.withOpacity(.8),
+          ),
+          const Gap(85),
+        ],
+      ),
     );
   }
 }
