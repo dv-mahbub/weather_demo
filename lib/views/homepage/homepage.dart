@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:lottie/lottie.dart';
 import 'package:weather_demo/components/constants/images.dart';
 import 'package:weather_demo/components/global_widgets/show_message.dart';
 import 'package:weather_demo/controllers/api_controllers/api_response_data.dart';
@@ -66,7 +67,7 @@ class _HomepageState extends ConsumerState<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    // fetchData();
+    ForecastModel? forecastData = ref.watch(forecastProvider);
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height,
@@ -92,16 +93,18 @@ class _HomepageState extends ConsumerState<Homepage> {
               slivers: [
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ...locationPart(),
-                      ...headerPart(),
-                      ...daySelector(),
-                      timeScifiedResult(),
-                      bottomPart(),
-                    ],
-                  ),
+                  child: forecastData == null
+                      ? Lottie.asset('asset/json/loader.json')
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ...locationPart(),
+                            ...headerPart(),
+                            ...daySelector(),
+                            timeScifiedResult(),
+                            bottomPart(),
+                          ],
+                        ),
                 ),
               ],
             ),
