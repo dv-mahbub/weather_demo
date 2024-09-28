@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +16,18 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   bool isTodaySelected = true;
+
+  @override
+  void initState() {
+    fetchData();
+    super.initState();
+  }
+
+  fetchData() async {
+    String apiKey = dotenv.env['API_KEY'] ?? '';
+    String apiUrl = dotenv.env['API_URL'] ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
