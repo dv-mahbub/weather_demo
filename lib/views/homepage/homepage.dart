@@ -94,7 +94,16 @@ class _HomepageState extends ConsumerState<Homepage> {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: forecastData == null
-                      ? Lottie.asset('asset/json/loader.json')
+                      ? Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(.3),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Lottie.asset('assets/json/loader.json',
+                                width: 125, fit: BoxFit.fitWidth),
+                          ),
+                        )
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
