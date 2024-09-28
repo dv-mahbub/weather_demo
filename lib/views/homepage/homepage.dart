@@ -1,20 +1,25 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:weather_demo/components/constants/images.dart';
+import 'package:weather_demo/main.dart';
 import 'package:weather_demo/views/homepage/circular_notch_clipper.dart';
 import 'package:weather_demo/views/homepage/triangle.dart';
 
-class Homepage extends StatefulWidget {
+class Homepage extends ConsumerStatefulWidget {
   const Homepage({super.key});
 
   @override
-  State<Homepage> createState() => _HomepageState();
+  ConsumerState<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends ConsumerState<Homepage> {
   bool isTodaySelected = true;
 
   @override
@@ -26,6 +31,9 @@ class _HomepageState extends State<Homepage> {
   fetchData() async {
     String apiKey = dotenv.env['API_KEY'] ?? '';
     String apiUrl = dotenv.env['API_URL'] ?? '';
+    log(apiUrl);
+    final LatLng? location = ref.read(locationProvider);
+    log('lat: ${location?.latitude}, lon: ${location?.longitude}');
   }
 
   @override

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 import 'package:weather_demo/components/global_functions/navigate.dart';
 import 'package:weather_demo/components/global_widgets/show_message.dart';
+import 'package:weather_demo/main.dart';
 import 'package:weather_demo/views/homepage/homepage.dart';
 
 class LocationTrackingPage extends StatefulWidget {
@@ -72,23 +74,28 @@ class _LocationTrackingPageState extends State<LocationTrackingPage> {
                   ],
                 ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: isLoaded ? Colors.blue : Colors.grey,
-                    foregroundColor: Colors.white),
-                onPressed: isLoaded
-                    ? () => navigate(
-                          context: context,
-                          child: const Homepage(),
-                        )
-                    : () {
-                        if (mounted) {
-                          showErrorMessage(
-                              context, 'Current location not fetched yet');
+              Consumer(builder: (context, ref, child) {
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: isLoaded ? Colors.blue : Colors.grey,
+                      foregroundColor: Colors.white),
+                  onPressed: isLoaded
+                      ? () {
+                          ref.read(locationProvider.notifier).setLocation(
+                              currentLocation.latitude,
+                              currentLocation.longitude);
+
+                          navigate(context: context, child: const Homepage());
                         }
-                      },
-                child: const Text('Use current location'),
-              ),
+                      : () {
+                          if (mounted) {
+                            showErrorMessage(
+                                context, 'Current location not fetched yet');
+                          }
+                        },
+                  child: const Text('Use current location'),
+                );
+              }),
             ],
           ),
         ),
@@ -97,10 +104,10 @@ class _LocationTrackingPageState extends State<LocationTrackingPage> {
   }
 
   Future<void> locate() async {
-    Position a = await determinePosition();
+    Position position = await determinePosition();
     setState(() {
       zoom = 14;
-      currentLocation = LatLng(a.latitude, a.longitude);
+      currentLocation = LatLng(position.latitude, position.longitude);
       mapKey = UniqueKey();
       isLoaded = true;
     });
