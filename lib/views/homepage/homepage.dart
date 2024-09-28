@@ -8,6 +8,8 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:weather_demo/components/constants/images.dart';
+import 'package:weather_demo/controllers/api_controllers/api_response_data.dart';
+import 'package:weather_demo/controllers/api_controllers/get_api_controller.dart';
 import 'package:weather_demo/main.dart';
 import 'package:weather_demo/views/homepage/circular_notch_clipper.dart';
 import 'package:weather_demo/views/homepage/triangle.dart';
@@ -34,10 +36,18 @@ class _HomepageState extends ConsumerState<Homepage> {
     log(apiUrl);
     final LatLng? location = ref.read(locationProvider);
     log('lat: ${location?.latitude}, lon: ${location?.longitude}');
+    Uri url = Uri.parse(apiUrl).replace(queryParameters: {
+      'key': apiKey,
+      'q': '${location?.latitude},${location?.longitude}',
+      'aqi': 'no',
+    });
+    ApiResponseData result = await getApiController(url.toString());
+    log(result.responseBody);
   }
 
   @override
   Widget build(BuildContext context) {
+    fetchData();
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height,
