@@ -375,9 +375,9 @@ class _HomepageState extends ConsumerState<Homepage> {
                 child: Column(
                   children: [
                     const Gap(55),
-                    sunsetSunriseContainer(),
+                    sunsetSunriseContainer(forecastData),
                     const Gap(12),
-                    uvContainer(),
+                    uvContainer(forecastData),
                   ],
                 ),
               ),
@@ -420,7 +420,7 @@ class _HomepageState extends ConsumerState<Homepage> {
     );
   }
 
-  Widget sunsetSunriseContainer() {
+  Widget sunsetSunriseContainer(ForecastModel forecastData) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: screenWidth * .85,
@@ -447,11 +447,13 @@ class _HomepageState extends ConsumerState<Homepage> {
           ),
           textColumn(
             title: 'Sunset',
-            info: '5:51PM',
+            info:
+                '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? (forecastData.forecast?.forecastday?[0].astro?.sunset) : ''}',
           ),
           textColumn(
             title: 'Sunrise',
-            info: '7:00AM',
+            info:
+                '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? (forecastData.forecast?.forecastday?[0].astro?.sunrise) : ''}',
             align: CrossAxisAlignment.end,
           ),
         ],
@@ -483,7 +485,7 @@ class _HomepageState extends ConsumerState<Homepage> {
           style: GoogleFonts.quicksand(
             textStyle: TextStyle(
               color: color ?? Colors.white,
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -492,7 +494,7 @@ class _HomepageState extends ConsumerState<Homepage> {
     );
   }
 
-  Widget uvContainer() {
+  Widget uvContainer(ForecastModel forecastData) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: screenWidth * .85,
@@ -519,7 +521,7 @@ class _HomepageState extends ConsumerState<Homepage> {
           ),
           textColumn(
             title: 'UV Index',
-            info: '1 Low',
+            info: '${forecastData.current?.uv?.sign} Low',
             color: Colors.white.withOpacity(.8),
           ),
           const Gap(85),
