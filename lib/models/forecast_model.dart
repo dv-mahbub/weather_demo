@@ -49,7 +49,7 @@ class Current {
   double? windKph;
   int? windDegree;
   String? windDir;
-  int? pressureMb;
+  double? pressureMb;
   double? pressureIn;
   double? precipMm;
   double? precipIn;
@@ -63,14 +63,14 @@ class Current {
   double? heatindexF;
   double? dewpointC;
   double? dewpointF;
-  int? visKm;
-  int? visMiles;
-  int? uv;
+  double? visKm;
+  double? visMiles;
+  num? uv;
   double? gustMph;
   double? gustKph;
   int? timeEpoch;
   String? time;
-  int? snowCm;
+  double? snowCm;
   int? willItRain;
   int? chanceOfRain;
   int? willItSnow;
@@ -284,7 +284,7 @@ class Astro {
   String? moonrise;
   String? moonset;
   String? moonPhase;
-  int? moonIllumination;
+  num? moonIllumination;
   int? isMoonUp;
   int? isSunUp;
 
@@ -330,19 +330,19 @@ class Day {
   double? avgtempC;
   double? avgtempF;
   double? maxwindMph;
-  int? maxwindKph;
+  double? maxwindKph;
   double? totalprecipMm;
   double? totalprecipIn;
-  int? totalsnowCm;
+  double? totalsnowCm;
   double? avgvisKm;
-  int? avgvisMiles;
+  double? avgvisMiles;
   int? avghumidity;
   int? dailyWillItRain;
   int? dailyChanceOfRain;
   int? dailyWillItSnow;
   int? dailyChanceOfSnow;
   Condition? condition;
-  int? uv;
+  num? uv;
 
   Day({
     this.maxtempC,
