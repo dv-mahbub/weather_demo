@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather_demo/components/constants/images.dart';
 import 'package:weather_demo/components/global_functions/navigate.dart';
+import 'package:weather_demo/components/global_functions/time_format.dart';
 import 'package:weather_demo/components/global_widgets/show_message.dart';
 import 'package:weather_demo/controllers/api_controllers/api_response_data.dart';
 import 'package:weather_demo/controllers/api_controllers/get_api_controller.dart';
@@ -55,6 +56,7 @@ class _HomepageState extends ConsumerState<Homepage> {
       if (result.statusCode == 200) {
         ref.read(forecastProvider.notifier).setForecastData(
             ForecastModel.fromJson(jsonDecode(result.responseBody)));
+        log(result.responseBody);
       } else {
         try {
           showError(jsonDecode(result.responseBody)['error']['message']);
@@ -127,7 +129,6 @@ class _HomepageState extends ConsumerState<Homepage> {
   }
 
   List<Widget> locationPart(ForecastModel forecastData) {
-    log(slashRemover(forecastData.current?.condition?.icon ?? ''));
     return [
       const Gap(8),
       Text(
@@ -193,8 +194,8 @@ class _HomepageState extends ConsumerState<Homepage> {
           )
         ],
       ),
-      const Text(
-        'Partly Cloud  -  H:17o  L:4o',
+      Text(
+        '${forecastData.current?.condition?.text}  -  H:${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? ('${forecastData.forecast?.forecastday?[0].day?.maxtempC} °') : ''}  L:${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? ('${forecastData.forecast?.forecastday?[0].day?.mintempC} °') : ''}',
         style: TextStyle(fontSize: 18, color: Colors.white),
       ),
     ];
@@ -251,41 +252,49 @@ class _HomepageState extends ConsumerState<Homepage> {
   Widget timeScifiedResult(ForecastModel forecastData) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          timeSpecifiedContainer(
-              time: 'Now',
-              image: AppImages.slightTouchHappyDay,
-              temperature: 30),
-          timeSpecifiedContainer(
-              time: 'Now',
-              image: AppImages.slightTouchHappyDay,
-              temperature: 30),
-          timeSpecifiedContainer(
-              time: 'Now',
-              image: AppImages.slightTouchHappyDay,
-              temperature: 30),
-          timeSpecifiedContainer(
-              time: 'Now',
-              image: AppImages.slightTouchHappyDay,
-              temperature: 30),
-          timeSpecifiedContainer(
-              time: 'Now',
-              image: AppImages.slightTouchHappyDay,
-              temperature: 30),
-          timeSpecifiedContainer(
-              time: 'Now',
-              image: AppImages.slightTouchHappyDay,
-              temperature: 30),
-        ],
-      ),
+      child: (forecastData.forecast?.forecastday != null &&
+              forecastData.forecast!.forecastday!.isNotEmpty)
+          ? Row(
+              children: [
+                timeSpecifiedContainer(
+                  time: 'Now',
+                  image: slashRemover(forecastData.current?.condition?.icon),
+                  temperature: forecastData.current?.tempC,
+                ),
+                ...List.generate(
+                  forecastData.forecast?.forecastday?[0].hour?.length ?? 0,
+                  (index) {
+                    Current? weatherData =
+                        forecastData.forecast?.forecastday?[0].hour?[index];
+                    try {
+                      DateTime dateTime =
+                          DateTime.parse(weatherData?.time ?? '');
+                      DateTime now = DateTime.now();
+
+                      DateTime sixPM =
+                          DateTime(now.year, now.month, now.day, 18, 0);
+                      if (!dateTime.isAfter(DateTime.now()) &&
+                          now.isBefore(sixPM)) {
+                        return Container();
+                      }
+                    } catch (e) {
+                      log('Failed to check isAfter');
+                    }
+                    return timeSpecifiedContainer(
+                      time: formateTimeOnly(weatherData?.time),
+                      image: slashRemover(weatherData?.condition?.icon),
+                      temperature: weatherData?.tempC,
+                    );
+                  },
+                ),
+              ],
+            )
+          : Container(),
     );
   }
 
   Widget timeSpecifiedContainer(
-      {required String time,
-      required String image,
-      required double temperature}) {
+      {required String time, required String image, double? temperature}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: Container(
@@ -314,12 +323,19 @@ class _HomepageState extends ConsumerState<Homepage> {
               time,
               style: const TextStyle(color: Colors.white),
             ),
-            Image.asset(
-              image,
-              width: 55,
+            CachedNetworkImage(
+              imageUrl: image,
+              width: 45,
+              fit: BoxFit.fitWidth,
+              errorWidget: (context, error, child) {
+                return SvgPicture.asset(
+                  AppImages.errorImage,
+                  width: 40,
+                );
+              },
             ),
             Text(
-              '$temperature°',
+              temperature != null ? '$temperature°' : '',
               style: const TextStyle(color: Colors.white),
             ),
           ],
