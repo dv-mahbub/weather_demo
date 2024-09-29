@@ -8,4 +8,6 @@ class AppImages {
   static String slightTouchHappyDay = '$imageFolder/slight_touch_happy_day.png';
   static String sun = '$imageFolder/sun.png';
   static String sunset = '$imageFolder/sunset.png';
+  static String locationIcon = 'assets/svg/location.svg';
+  static String errorImage = 'assets/svg/error_image.svg';
 }

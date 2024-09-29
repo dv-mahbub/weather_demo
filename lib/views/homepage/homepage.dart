@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather_demo/components/constants/images.dart';
+import 'package:weather_demo/components/global_functions/navigate.dart';
 import 'package:weather_demo/components/global_widgets/show_message.dart';
 import 'package:weather_demo/controllers/api_controllers/api_response_data.dart';
 import 'package:weather_demo/controllers/api_controllers/get_api_controller.dart';
@@ -17,6 +19,7 @@ import 'package:weather_demo/main.dart';
 import 'package:weather_demo/models/forecast_model.dart';
 import 'package:weather_demo/views/homepage/circular_notch_clipper.dart';
 import 'package:weather_demo/views/homepage/triangle.dart';
+import 'package:weather_demo/views/location_tracker_page.dart';
 
 class Homepage extends ConsumerStatefulWidget {
   const Homepage({super.key});
@@ -107,11 +110,11 @@ class _HomepageState extends ConsumerState<Homepage> {
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            ...locationPart(),
-                            ...headerPart(),
-                            ...daySelector(),
-                            timeScifiedResult(),
-                            bottomPart(),
+                            ...locationPart(forecastData),
+                            ...headerPart(forecastData),
+                            ...daySelector(forecastData),
+                            timeScifiedResult(forecastData),
+                            bottomPart(forecastData),
                           ],
                         ),
                 ),
@@ -123,18 +126,25 @@ class _HomepageState extends ConsumerState<Homepage> {
     );
   }
 
-  List<Widget> locationPart() {
+  List<Widget> locationPart(ForecastModel forecastData) {
+    log(slashRemover(forecastData.current?.condition?.icon ?? ''));
     return [
-      const Text(
-        'Dhaka',
-        style: TextStyle(color: Colors.white, fontSize: 32),
+      const Gap(8),
+      Text(
+        forecastData.location?.name ?? '',
+        style: const TextStyle(color: Colors.white, fontSize: 32),
       ),
-      const Gap(12),
+      const Gap(4),
       InkWell(
+        onTap: () {
+          if (mounted) {
+            navigate(context: context, child: const LocationTrackingPage());
+          }
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset('assets/svg/location.svg'),
+            SvgPicture.asset(AppImages.locationIcon),
             const Gap(7),
             const Text(
               'Current Location',
@@ -146,21 +156,39 @@ class _HomepageState extends ConsumerState<Homepage> {
     ];
   }
 
-  List<Widget> headerPart() {
+  String slashRemover(String? url) {
+    if (url == null) {
+      return '';
+    } else if (url.startsWith("//")) {
+      url = url.replaceFirst("//", "http://");
+      log(url);
+    } else if (url.startsWith('file:///')) {
+      url = url.replaceFirst('file:///', 'http://');
+    }
+    return url;
+  }
+
+  List<Widget> headerPart(ForecastModel forecastData) {
     return [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            AppImages.partlyCloudy,
-            width: 135,
+          CachedNetworkImage(
+            imageUrl: slashRemover(forecastData.current?.condition?.icon),
+            width: 90,
             fit: BoxFit.fitWidth,
+            errorWidget: (context, error, child) {
+              return SvgPicture.asset(
+                AppImages.errorImage,
+                width: 70,
+              );
+            },
           ),
           const Gap(10),
           Text(
-            '13°',
+            '${forecastData.current?.tempC}°',
             style: GoogleFonts.quicksand(
-              textStyle: const TextStyle(fontSize: 102, color: Colors.white),
+              textStyle: const TextStyle(fontSize: 90, color: Colors.white),
             ),
           )
         ],
@@ -172,7 +200,7 @@ class _HomepageState extends ConsumerState<Homepage> {
     ];
   }
 
-  List<Widget> daySelector() {
+  List<Widget> daySelector(ForecastModel forecastData) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -220,7 +248,7 @@ class _HomepageState extends ConsumerState<Homepage> {
     ];
   }
 
-  Widget timeScifiedResult() {
+  Widget timeScifiedResult(ForecastModel forecastData) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -300,7 +328,7 @@ class _HomepageState extends ConsumerState<Homepage> {
     );
   }
 
-  Widget bottomPart() {
+  Widget bottomPart(ForecastModel forecastData) {
     return Padding(
       padding: const EdgeInsets.only(top: 5),
       child: Stack(
