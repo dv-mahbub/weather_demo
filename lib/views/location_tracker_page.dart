@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
@@ -35,67 +36,72 @@ class _LocationTrackingPageState extends State<LocationTrackingPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: screenSize.height * .75,
-                width: screenSize.width * .9,
-                child: Stack(
-                  children: [
-                    FlutterMap(
-                      key: mapKey,
-                      options: MapOptions(
-                        initialCenter: currentLocation,
-                        maxZoom: zoom,
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.app',
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * .9,
+                  child: Stack(
+                    children: [
+                      FlutterMap(
+                        key: mapKey,
+                        options: MapOptions(
+                          initialCenter: currentLocation,
+                          maxZoom: zoom,
                         ),
-                        MarkerLayer(markers: [
-                          Marker(
-                            point: currentLocation,
-                            width: 80.0,
-                            height: 80.0,
-                            child: const Icon(Icons.location_on,
-                                size: 34, color: Colors.red),
-                          )
-                        ])
-                      ],
-                    ),
-                    Positioned(
-                      bottom: 16.0,
-                      right: 16.0,
-                      child: FloatingActionButton(
-                        onPressed: locate,
-                        child: const Icon(Icons.my_location),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.app',
+                          ),
+                          MarkerLayer(markers: [
+                            Marker(
+                              point: currentLocation,
+                              width: 80.0,
+                              height: 80.0,
+                              child: const Icon(Icons.location_on,
+                                  size: 34, color: Colors.red),
+                            )
+                          ])
+                        ],
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 16.0,
+                        right: 16.0,
+                        child: FloatingActionButton(
+                          onPressed: locate,
+                          child: const Icon(Icons.my_location),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Consumer(builder: (context, ref, child) {
-                return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: isLoaded ? Colors.blue : Colors.grey,
-                      foregroundColor: Colors.white),
-                  onPressed: isLoaded
-                      ? () {
-                          ref.read(locationProvider.notifier).setLocation(
-                              currentLocation.latitude,
-                              currentLocation.longitude);
+              Gap(8),
+              Consumer(
+                builder: (context, ref, child) {
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: isLoaded ? Colors.blue : Colors.grey,
+                        foregroundColor: Colors.white),
+                    onPressed: isLoaded
+                        ? () {
+                            ref.read(locationProvider.notifier).setLocation(
+                                currentLocation.latitude,
+                                currentLocation.longitude);
 
-                          navigate(context: context, child: const Homepage());
-                        }
-                      : () {
-                          if (mounted) {
-                            showErrorMessage(
-                                context, 'Current location not fetched yet');
+                            navigate(context: context, child: const Homepage());
                           }
-                        },
-                  child: const Text('Use current location'),
-                );
-              }),
+                        : () {
+                            if (mounted) {
+                              showErrorMessage(
+                                  context, 'Current location not fetched yet');
+                            }
+                          },
+                    child: const Text('Use current location'),
+                  );
+                },
+              ),
+              Gap(5),
             ],
           ),
         ),
