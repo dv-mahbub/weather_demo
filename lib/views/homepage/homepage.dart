@@ -329,10 +329,10 @@ class _HomepageState extends ConsumerState<Homepage> {
                               DateTime.parse(weatherData?.time ?? '');
                           DateTime now = DateTime.now();
 
-                          DateTime sixPM =
-                              DateTime(now.year, now.month, now.day, 18, 0);
+                          DateTime elevenPM =
+                              DateTime(now.year, now.month, now.day, 23, 0);
                           if (!dateTime.isAfter(DateTime.now()) &&
-                              now.isBefore(sixPM)) {
+                              now.isBefore(elevenPM)) {
                             return Container();
                           }
                         } catch (e) {
