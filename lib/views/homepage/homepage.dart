@@ -30,8 +30,6 @@ class Homepage extends ConsumerStatefulWidget {
 }
 
 class _HomepageState extends ConsumerState<Homepage> {
-  bool isTodaySelected = true;
-
   @override
   void initState() {
     fetchData();
@@ -49,6 +47,7 @@ class _HomepageState extends ConsumerState<Homepage> {
       'key': apiKey,
       'q': '${location?.latitude},${location?.longitude}',
       'aqi': 'no',
+      'days': '2'
     });
 
     try {
@@ -194,14 +193,20 @@ class _HomepageState extends ConsumerState<Homepage> {
           )
         ],
       ),
-      Text(
-        '${forecastData.current?.condition?.text}  -  H:${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? ('${forecastData.forecast?.forecastday?[0].day?.maxtempC} °') : ''}  L:${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? ('${forecastData.forecast?.forecastday?[0].day?.mintempC} °') : ''}',
-        style: TextStyle(fontSize: 18, color: Colors.white),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Text(
+          '${forecastData.current?.condition?.text}  -  H:${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? ('${forecastData.forecast?.forecastday?[0].day?.maxtempC}°') : ''}  L:${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? ('${forecastData.forecast?.forecastday?[0].day?.mintempC}°') : ''}',
+          style: TextStyle(fontSize: 18, color: Colors.white),
+          textAlign: TextAlign.center,
+        ),
       ),
     ];
   }
 
   List<Widget> daySelector(ForecastModel forecastData) {
+    final isTodaySelected = ref.watch(daySelectorProvider);
+
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -210,11 +215,7 @@ class _HomepageState extends ConsumerState<Homepage> {
           children: [
             ElevatedButton(
               onPressed: () {
-                if (mounted) {
-                  setState(() {
-                    isTodaySelected = true;
-                  });
-                }
+                ref.read(daySelectorProvider.notifier).state = true;
               },
               style: ButtonStyle(
                 padding: const WidgetStatePropertyAll(
@@ -229,11 +230,7 @@ class _HomepageState extends ConsumerState<Homepage> {
             const Gap(5),
             ElevatedButton(
               onPressed: () {
-                if (mounted) {
-                  setState(() {
-                    isTodaySelected = false;
-                  });
-                }
+                ref.read(daySelectorProvider.notifier).state = false;
               },
               style: ButtonStyle(
                 backgroundColor: !isTodaySelected
@@ -250,46 +247,70 @@ class _HomepageState extends ConsumerState<Homepage> {
   }
 
   Widget timeScifiedResult(ForecastModel forecastData) {
+    final isTodaySelected = ref.watch(daySelectorProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: (forecastData.forecast?.forecastday != null &&
-              forecastData.forecast!.forecastday!.isNotEmpty)
-          ? Row(
-              children: [
-                timeSpecifiedContainer(
-                  time: 'Now',
-                  image: slashRemover(forecastData.current?.condition?.icon),
-                  temperature: forecastData.current?.tempC,
-                ),
-                ...List.generate(
-                  forecastData.forecast?.forecastday?[0].hour?.length ?? 0,
-                  (index) {
-                    Current? weatherData =
-                        forecastData.forecast?.forecastday?[0].hour?[index];
-                    try {
-                      DateTime dateTime =
-                          DateTime.parse(weatherData?.time ?? '');
-                      DateTime now = DateTime.now();
+      child: isTodaySelected
+          ? (forecastData.forecast?.forecastday != null &&
+                  forecastData.forecast!.forecastday!.isNotEmpty)
+              ? Row(
+                  children: [
+                    timeSpecifiedContainer(
+                      time: 'Now',
+                      image:
+                          slashRemover(forecastData.current?.condition?.icon),
+                      temperature: forecastData.current?.tempC,
+                    ),
+                    ...List.generate(
+                      forecastData.forecast?.forecastday?[0].hour?.length ?? 0,
+                      (index) {
+                        Current? weatherData =
+                            forecastData.forecast?.forecastday?[0].hour?[index];
+                        try {
+                          DateTime dateTime =
+                              DateTime.parse(weatherData?.time ?? '');
+                          DateTime now = DateTime.now();
 
-                      DateTime sixPM =
-                          DateTime(now.year, now.month, now.day, 18, 0);
-                      if (!dateTime.isAfter(DateTime.now()) &&
-                          now.isBefore(sixPM)) {
-                        return Container();
-                      }
-                    } catch (e) {
-                      log('Failed to check isAfter');
-                    }
-                    return timeSpecifiedContainer(
-                      time: formateTimeOnly(weatherData?.time),
-                      image: slashRemover(weatherData?.condition?.icon),
-                      temperature: weatherData?.tempC,
-                    );
-                  },
-                ),
-              ],
-            )
-          : Container(),
+                          DateTime sixPM =
+                              DateTime(now.year, now.month, now.day, 18, 0);
+                          if (!dateTime.isAfter(DateTime.now()) &&
+                              now.isBefore(sixPM)) {
+                            return Container();
+                          }
+                        } catch (e) {
+                          log('Failed to check isAfter');
+                        }
+                        return timeSpecifiedContainer(
+                          time: formateTimeOnly(weatherData?.time),
+                          image: slashRemover(weatherData?.condition?.icon),
+                          temperature: weatherData?.tempC,
+                        );
+                      },
+                    ),
+                  ],
+                )
+              : Container(height: 134)
+          : (forecastData.forecast?.forecastday != null &&
+                  forecastData.forecast!.forecastday!.isNotEmpty &&
+                  forecastData.forecast!.forecastday!.length > 1)
+              ? Row(
+                  children: [
+                    ...List.generate(
+                      forecastData.forecast?.forecastday?[1].hour?.length ?? 0,
+                      (index) {
+                        Current? weatherData =
+                            forecastData.forecast?.forecastday?[1].hour?[index];
+
+                        return timeSpecifiedContainer(
+                          time: formateTimeOnly(weatherData?.time),
+                          image: slashRemover(weatherData?.condition?.icon),
+                          temperature: weatherData?.tempC,
+                        );
+                      },
+                    ),
+                  ],
+                )
+              : Container(height: 134),
     );
   }
 
@@ -421,6 +442,7 @@ class _HomepageState extends ConsumerState<Homepage> {
   }
 
   Widget sunsetSunriseContainer(ForecastModel forecastData) {
+    final isTodaySelected = ref.watch(daySelectorProvider);
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: screenWidth * .85,
@@ -447,13 +469,15 @@ class _HomepageState extends ConsumerState<Homepage> {
           ),
           textColumn(
             title: 'Sunset',
-            info:
-                '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? (forecastData.forecast?.forecastday?[0].astro?.sunset) : ''}',
+            info: isTodaySelected
+                ? '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? (forecastData.forecast?.forecastday?[0].astro?.sunset) : ''}'
+                : '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty && forecastData.forecast!.forecastday!.length > 1) ? (forecastData.forecast?.forecastday?[1].astro?.sunset) : ''}',
           ),
           textColumn(
             title: 'Sunrise',
-            info:
-                '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? (forecastData.forecast?.forecastday?[0].astro?.sunrise) : ''}',
+            info: isTodaySelected
+                ? '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty) ? (forecastData.forecast?.forecastday?[0].astro?.sunrise) : ''}'
+                : '${(forecastData.forecast?.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty && forecastData.forecast!.forecastday!.length > 1) ? (forecastData.forecast?.forecastday?[1].astro?.sunrise) : ''}',
             align: CrossAxisAlignment.end,
           ),
         ],
@@ -495,6 +519,7 @@ class _HomepageState extends ConsumerState<Homepage> {
   }
 
   Widget uvContainer(ForecastModel forecastData) {
+    final isTodaySelected = ref.watch(daySelectorProvider);
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: screenWidth * .85,
@@ -521,7 +546,8 @@ class _HomepageState extends ConsumerState<Homepage> {
           ),
           textColumn(
             title: 'UV Index',
-            info: '${forecastData.current?.uv?.sign} Low',
+            info:
+                '${isTodaySelected ? forecastData.current?.uv?.sign : (forecastData.forecast != null && forecastData.forecast!.forecastday != null && forecastData.forecast!.forecastday!.isNotEmpty && forecastData.forecast!.forecastday!.length > 1) ? forecastData.forecast!.forecastday![1].day?.uv?.sign ?? '' : ''} Low',
             color: Colors.white.withOpacity(.8),
           ),
           const Gap(85),

@@ -11,6 +11,8 @@ final locationProvider =
   return LocationNotifier();
 });
 
+final daySelectorProvider = StateProvider<bool>((ref) => true);
+
 final forecastProvider =
     StateNotifierProvider<ForecastNotifier, ForecastModel?>((ref) {
   return ForecastNotifier();
