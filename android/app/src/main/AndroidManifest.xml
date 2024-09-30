@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
-        android:label="weather_demo"
+        android:label="Weather"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
