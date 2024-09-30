@@ -1,16 +1,27 @@
-# weather_demo
 
-A new Flutter project.
+# Weather Demo Task for Steadfast IT
 
-## Getting Started
+This is a demonstration of an Weather App. It includes a Splash Screen, a Location Tracking Page and Forecast page for preview weather forecast data.
 
-This project is a starting point for a Flutter application.
+The app is designed to load data once and store it locally using sqflite, allowing users to access the data even when there is no internet connection.
 
-A few resources to get you started if this is your first Flutter project:
+GPS service is used to track user's current location.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Additionally, a basic logo animation has been implemented on the Splash Screen for a more engaging user experience.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+# Some Screenshoots
+<p align="center"> <img src="https://raw.githubusercontent.com/dv-mahbub/file/refs/heads/main/weather_demo_task/splash_screen.gif" alt="Splash Screen" width="250"/>
+
+<img src="https://raw.githubusercontent.com/dv-mahbub/file/refs/heads/main/weather_demo_task/location_tracker_page.jpeg" alt="Location Tracking Page" width="250"/> 
+
+<img src="https://raw.githubusercontent.com/dv-mahbub/file/refs/heads/main/weather_demo_task/homepage.jpeg" alt="Homepage" width="250"/>
+
+<img src="https://raw.githubusercontent.com/dv-mahbub/file/refs/heads/main/weather_demo_task/homepae_next_day.jpeg" alt="Homepage - next day" width="250"/>
+
+</p>
+
+
+# Installation Guide
+Visit the link below, then download and install the apk file.
+https://github.com/dv-mahbub/weather_demo/tree/main/flutter_apk
