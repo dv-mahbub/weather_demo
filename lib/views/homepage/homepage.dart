@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import 'package:weather_demo/controllers/api_controllers/api_response_data.dart'
 import 'package:weather_demo/controllers/api_controllers/get_api_controller.dart';
 import 'package:weather_demo/controllers/database/database_service.dart';
 import 'package:weather_demo/main.dart';
+import 'package:weather_demo/models/database_model.dart';
 import 'package:weather_demo/models/forecast_model.dart';
 import 'package:weather_demo/views/homepage/circular_notch_clipper.dart';
 import 'package:weather_demo/views/homepage/triangle.dart';
@@ -35,8 +37,23 @@ class _HomepageState extends ConsumerState<Homepage> {
 
   @override
   void initState() {
-    fetchData();
+    checkConnection();
     super.initState();
+  }
+
+  checkConnection() async {
+    ref.read(dataAvailablityProvider.notifier).state = true;
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.first == ConnectivityResult.mobile ||
+        connectivityResult.first == ConnectivityResult.wifi) {
+      // Connected to the internet
+      fetchData();
+    } else {
+      // Not connected to any network
+      showError('No internet connect');
+      loadDataFromLocalDatabase();
+    }
   }
 
   fetchData() async {
@@ -67,6 +84,7 @@ class _HomepageState extends ConsumerState<Homepage> {
           );
         }
       } else {
+        loadDataFromLocalDatabase();
         try {
           showError(jsonDecode(result.responseBody)['error']['message']);
         } catch (e) {
@@ -74,14 +92,32 @@ class _HomepageState extends ConsumerState<Homepage> {
         }
       }
     } catch (e) {
+      loadDataFromLocalDatabase();
       showError('Api Call Failed: $e');
       log('Forecast api call: $e');
+    }
+  }
+
+  loadDataFromLocalDatabase() async {
+    final List<DatabaseModel> forecasts = await databaseService.getForecast();
+    if (forecasts.isNotEmpty) {
+      try {
+        ref.read(forecastProvider.notifier).setForecastData(
+            ForecastModel.fromJson(jsonDecode(forecasts[0].json)));
+      } catch (e) {
+        ref.read(dataAvailablityProvider.notifier).state = false;
+
+        log('Failed to assign json in Data Model from databse');
+      }
+    } else {
+      ref.read(dataAvailablityProvider.notifier).state = false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     ForecastModel? forecastData = ref.watch(forecastProvider);
+    bool isDataAvailable = ref.watch(dataAvailablityProvider);
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height,
@@ -101,33 +137,46 @@ class _HomepageState extends ConsumerState<Homepage> {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () async {},
+            onRefresh: () async {
+              await checkConnection();
+            },
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: forecastData == null
+                  child: !isDataAvailable
                       ? Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(.3),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Lottie.asset('assets/json/loader.json',
-                                width: 125, fit: BoxFit.fitWidth),
+                          child: Text(
+                            'Please Turn On Internet Connection',
+                            style: TextStyle(
+                                color: Colors.red.shade50,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
                           ),
                         )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ...locationPart(forecastData),
-                            ...headerPart(forecastData),
-                            ...daySelector(forecastData),
-                            timeScifiedResult(forecastData),
-                            bottomPart(forecastData),
-                          ],
-                        ),
+                      : forecastData == null
+                          ? Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(.3),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Lottie.asset('assets/json/loader.json',
+                                    width: 125, fit: BoxFit.fitWidth),
+                              ),
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ...locationPart(forecastData),
+                                ...headerPart(forecastData),
+                                ...daySelector(forecastData),
+                                timeScifiedResult(forecastData),
+                                bottomPart(forecastData),
+                              ],
+                            ),
                 ),
               ],
             ),
