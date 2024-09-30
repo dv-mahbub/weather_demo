@@ -46,12 +46,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Colors.blue.shade200,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 250, child: AnimatedLogo()),
+            SizedBox(height: screenHeight * .4, child: AnimatedLogo()),
             Text(
               'Weather App',
               style: TextStyle(
@@ -60,12 +62,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const Gap(65),
+            Gap(screenHeight * .1),
             const TypewriterText(
               'Loading...',
-              style: TextStyle(color: Colors.blue),
+              // style: TextStyle(color: Colors.blue),
             ),
-            const Gap(15),
+            Gap(screenHeight * .01),
           ],
         ),
       ),
