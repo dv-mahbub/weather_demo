@@ -16,6 +16,7 @@ import 'package:weather_demo/components/global_functions/time_format.dart';
 import 'package:weather_demo/components/global_widgets/show_message.dart';
 import 'package:weather_demo/controllers/api_controllers/api_response_data.dart';
 import 'package:weather_demo/controllers/api_controllers/get_api_controller.dart';
+import 'package:weather_demo/controllers/database/database_service.dart';
 import 'package:weather_demo/main.dart';
 import 'package:weather_demo/models/forecast_model.dart';
 import 'package:weather_demo/views/homepage/circular_notch_clipper.dart';
@@ -30,6 +31,8 @@ class Homepage extends ConsumerStatefulWidget {
 }
 
 class _HomepageState extends ConsumerState<Homepage> {
+  final DatabaseService databaseService = DatabaseService.instance;
+
   @override
   void initState() {
     fetchData();
@@ -41,7 +44,7 @@ class _HomepageState extends ConsumerState<Homepage> {
     String apiKey = dotenv.env['API_KEY'] ?? '';
     String apiUrl = dotenv.env['API_URL'] ?? '';
     final LatLng? location = ref.read(locationProvider);
-    log('lat: ${location?.latitude}, lon: ${location?.longitude}');
+    // log('lat: ${location?.latitude}, lon: ${location?.longitude}');
 
     Uri url = Uri.parse(apiUrl).replace(queryParameters: {
       'key': apiKey,
@@ -55,7 +58,14 @@ class _HomepageState extends ConsumerState<Homepage> {
       if (result.statusCode == 200) {
         ref.read(forecastProvider.notifier).setForecastData(
             ForecastModel.fromJson(jsonDecode(result.responseBody)));
-        log(result.responseBody);
+        //save in databse
+        if (location != null) {
+          databaseService.addForecast(
+            lat: location.latitude,
+            long: location.longitude,
+            json: result.responseBody,
+          );
+        }
       } else {
         try {
           showError(jsonDecode(result.responseBody)['error']['message']);
@@ -161,7 +171,6 @@ class _HomepageState extends ConsumerState<Homepage> {
       return '';
     } else if (url.startsWith("//")) {
       url = url.replaceFirst("//", "http://");
-      log(url);
     } else if (url.startsWith('file:///')) {
       url = url.replaceFirst('file:///', 'http://');
     }
